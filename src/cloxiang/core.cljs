@@ -1,6 +1,7 @@
 (ns cloxiang.core
     (:use [overnight.server :only [initialize]]
-          [cloxiang.handlers :only [registrar]]))
+          [overnight.sockets :only [with-sockets]]
+          [cloxiang.handlers :only [registrar move]]))
 
 (defn js-keys [obj]
     (.keys js/Object obj))
@@ -13,10 +14,14 @@
   (zip (js-keys obj)
        (js-vals obj)))
 
-(defn -main [& args]
+(defn -main [& args] (->
     (initialize
         [:get "/" #(println (view-js %))]
-        [:get "/\\w{5}" registrar]))
+        [:get "/\\w{5}" registrar])
+
+    (with-sockets
+        [:message "/move" move])
+))
 
 (set! *main-cli-fn* -main)
 

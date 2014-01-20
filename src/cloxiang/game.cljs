@@ -12,6 +12,11 @@
           black (game :black)]
         (first-missing red black)))
 
+(defn is-full [game]
+    (boolean
+        (and (game :red)
+             (game :black))))
+
 (defn- add-missing-player [game]
     (assoc game
         (missing-player game)
