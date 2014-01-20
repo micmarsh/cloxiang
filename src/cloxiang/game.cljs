@@ -12,7 +12,7 @@
           black (game :black)]
         (first-missing red black)))
 
-(defn is-full [game]
+(defn full? [game]
     (boolean
         (and (game :red)
              (game :black))))
