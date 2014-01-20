@@ -7,7 +7,7 @@
                     thing)]
         (do (println to-print) thing)))
 
-(defn- to-keywords [str-map]
+(defn to-keywords [str-map]
     (->> (for [key (keys str-map)
               value [(str-map key)]]
             [(keyword key)

@@ -63,10 +63,10 @@
 (defn connect [socket]
     (let [request (aget socket "upgradeReq")
           info (get-url request)
-          [id player] (clojure.string/split info #"/")
+          [m id player] (clojure.string/split info #"/")
           game (get-game @games id)
           with-player (if (player? player)
                         (assoc game (keyword player) socket)
                         game)]
-        (println game)
-        (swap! games #(assoc % id with-player))))
+        (swap! games #(assoc % id with-player))
+        "connected"))
