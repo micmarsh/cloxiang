@@ -7,7 +7,7 @@
     (apply str
         (-> req
             (aget "url")
-            rest))
+            rest)))
 
 (defn registrar [req]
     (let [id (get-id req)]

@@ -22,4 +22,4 @@
           game (if exists
                     (games id)
                     {:id id})]
-        (missing-player game))
+        (missing-player game)))
