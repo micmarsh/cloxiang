@@ -9,15 +9,18 @@
             (aget "url")
             rest)))
 
-(defn pret [thing]
-    (do (println thing) thing))
+(defn debug [thing & [message]]
+    (let [to-print (if message
+                    (str message thing)
+                    thing)])
+    (do (println to-print) thing))
 
 (defn registrar [req]
     (let [id (get-id req)]
         (swap! games #(open % id))
         (-> @games
-            pret
+            (debug "all the games evar: ")
             (get id)
-            pret
+            (debug "the game u found: ")
             missing-player
             name)))
