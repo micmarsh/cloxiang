@@ -5,10 +5,11 @@
 (def games (atom { }))
 
 (defn get-id [req]
-    (apply str
+    (let [to-str (partial apply str)]
         (-> req
             (aget "url")
-            rest)))
+            rest
+            to-str)))
 
 (defn registrar [req]
     (let [id (get-id req)
@@ -16,4 +17,8 @@
         (swap! games #(open % id))
         (-> prev-game
             missing-player
+            (or :none)
             name)))
+
+
+
