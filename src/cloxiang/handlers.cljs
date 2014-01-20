@@ -5,6 +5,15 @@
 
 (def games (atom { }))
 
+(def MoveMessage
+    {:gameId s/Str ; five chars long
+     :player s/Str ; "black", "red", "none"
+     :message {
+            :type s/Str ; only "move" right now
+            :from s/Str; dd?,dd? format, may be same as js is expecting
+            :to s/Str ; same^
+        }})
+
 (defn get-id [req]
     (let [to-str (partial apply str)]
         (-> req
@@ -21,17 +30,12 @@
             (or :none)
             name)))
 
-(def MoveMessage
-    {:gameId s/Str ; five chars long
-     :player s/Str ; "black", "red", "none"
-     :message {
-            :type s/Str ; only "move" right now
-            :from s/Str; dd?,dd? format, may be same as js is expecting
-            :to s/Str ; same^
-        }})
+(defn validate [schema object]
+    (try (s/validate schema object)
+        (catch js/Error e (debug "Incorrect Input" ""))))
 
 (defn move [message socket]
     (debug message "yo message: ")
     (->> message
         str->clj
-        (s/validate MoveMessage)))
+        (validate MoveMessage)))

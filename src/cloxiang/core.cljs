@@ -20,6 +20,7 @@
         [:get "/\\w{5}" registrar])
 
     (with-sockets
+        [:open "/move" #(println "open!!!")]
         [:message "/move" move])
 ))
 
