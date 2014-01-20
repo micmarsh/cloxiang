@@ -16,7 +16,7 @@
 (defn -main [& args]
     (initialize
         [:get "/" #(println (view-js %))]
-        [:get (js/RegExp "^/\\w{5}") registrar]))
+        [:get "/\\w{5}" registrar]))
 
 (set! *main-cli-fn* -main)
 

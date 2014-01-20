@@ -10,16 +10,18 @@
                     :black
               (not red)
                     :red))
-
 (defn missing-player [game]
     (let [red (game :red)
-          black (game :black)
-          to-add (first-missing red black)]
-          (assoc game to-add :unconfirmed)))
+          black (game :black)]
+        (first-missing red black)))
+
+(defn- add-missing-player [game]
+    (assoc game
+        (missing-player game)
+          :unconfirmed))
 
 (defn open [games id]
     (let [exists (contains? games id)
-          game (if exists
-                    (games id)
-                    {:id id})]
-        (missing-player game)))
+          game (if exists (games id) {:id id})
+          updated-game (add-missing-player game)]
+            (assoc games id updated-game)))

@@ -9,7 +9,15 @@
             (aget "url")
             rest)))
 
+(defn pret [thing]
+    (do (println thing) thing))
+
 (defn registrar [req]
     (let [id (get-id req)]
         (swap! games #(open % id))
-        (missing-player @games)))
+        (-> @games
+            pret
+            (get id)
+            pret
+            missing-player
+            name)))
