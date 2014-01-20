@@ -1,5 +1,6 @@
 (ns cloxiang.handlers
-    (:use [cloxiang.game :only [open missing-player]]))
+    (:use [cloxiang.game :only [open missing-player get-game]]
+          [cloxiang.utils :only [debug]]))
 
 (def games (atom { }))
 
@@ -9,18 +10,10 @@
             (aget "url")
             rest)))
 
-(defn debug [thing & [message]]
-    (let [to-print (if message
-                    (str message thing)
-                    thing)])
-    (do (println to-print) thing))
-
 (defn registrar [req]
-    (let [id (get-id req)]
+    (let [id (get-id req)
+          prev-game (get-game @games id)]
         (swap! games #(open % id))
-        (-> @games
-            (debug "all the games evar: ")
-            (get id)
-            (debug "the game u found: ")
+        (-> prev-game
             missing-player
             name)))

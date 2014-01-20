@@ -1,4 +1,5 @@
-(ns cloxiang.game)
+(ns cloxiang.game
+    (:use [cloxiang.utils :only [debug]]))
 
 ;API
 ;
@@ -7,9 +8,10 @@
 
 (defn- first-missing [red black]
         (cond (and (not black) red)
-                    :black
+                :black
               (not red)
-                    :red))
+                :red))
+
 (defn missing-player [game]
     (let [red (game :red)
           black (game :black)]
@@ -20,8 +22,13 @@
         (missing-player game)
           :unconfirmed))
 
+(defn get-game [games id]
+    (let [exists (contains? games id)]
+        (if exists (games id) {:id id})))
+
 (defn open [games id]
-    (let [exists (contains? games id)
-          game (if exists (games id) {:id id})
-          updated-game (add-missing-player game)]
-            (assoc games id updated-game)))
+    (let [update-games (partial assoc games id)]
+        (-> games
+            (get-game id)
+            add-missing-player
+            update-games)))
