@@ -23,10 +23,11 @@
         (missing-player game)
           :unconfirmed))
 
+(def Start (js/require "./xiangqi/starting_position"))
 (def Board (js/require "./xiangqi/movable_position"))
 
 (defn get-game [games id]
-    (get games id {:id id :board (new Board)}))
+    (get games id {:id id :board (Board. (new Start))}))
 
 (defn open [games id]
     (let [update-games (partial assoc games id)]
