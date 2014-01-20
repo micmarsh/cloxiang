@@ -19,6 +19,3 @@
             missing-player
             (or :none)
             name)))
-
-
-
