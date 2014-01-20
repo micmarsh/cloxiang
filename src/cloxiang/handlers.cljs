@@ -36,18 +36,29 @@
         (catch js/Error e
             (debug object "Incorrect Input: "))))
 
+(defn make-move! [board from to]
+    (.makeMove board from to))
 
 (defn- handle-move [object]
     (let [{:keys [gameId player message]} object
           {:keys [type from to]} message
           game (get-game @games gameId)
-          is-full (full? game)]
-          (cond (= player "none")
-                    nil ;probably a better way to say "don't send"
-                (and (= type "move") is-full)
-                    "lots of side-effects"
-                (not is-full)
-                    "also lots of side-effects")))
+          {:keys [board red black]} game]
+
+          (println (= type "move"))
+          (println (full? game))
+          (println (.canMove board from to))
+
+          (if  (and (= type "move")
+                    (full? game)
+                    (.canMove board from to))
+                (do
+                    (make-move! board from to)
+                    (.send red object)
+                    (.send black object)))))
+
+; TODO here: need a check for move legality, if legal then send
+; move to both red and black if true. Imperative as all heck, but much cleaner
 
 (defn move [message socket]
     (->> message
@@ -68,5 +79,6 @@
           with-player (if (player? player)
                         (assoc game (keyword player) socket)
                         game)]
+        (println game)
         (swap! games #(assoc % id with-player))
         "connected"))
