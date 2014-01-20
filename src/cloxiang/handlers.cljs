@@ -79,6 +79,6 @@
           with-player (if (player? player)
                         (assoc game (keyword player) socket)
                         game)]
-        (println game)
+        (println with-player)
         (swap! games #(assoc % id with-player))
         "connected"))
