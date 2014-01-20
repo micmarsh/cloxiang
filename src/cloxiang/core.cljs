@@ -1,5 +1,6 @@
 (ns cloxiang.core
-    (:use [overnight.server :only [initialize]]))
+    (:use [overnight.server :only [initialize]]
+          [cloxiang.handlers :only [registrar]]))
 
 (defn js-keys [obj]
     (.keys js/Object obj))
@@ -14,7 +15,8 @@
 
 (defn -main [& args]
     (initialize
-        [:get "/" #(identity "yo")]))
+        [:get "/" #(println (view-js %))]
+        [:get (js/RegExp "^/\\w{5}") registrar]))
 
 (set! *main-cli-fn* -main)
 
