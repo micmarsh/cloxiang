@@ -1,7 +1,7 @@
 (ns cloxiang.core
     (:use [overnight.server :only [initialize]]
           [overnight.sockets :only [with-sockets]]
-          [cloxiang.handlers :only [registrar move connect]]))
+          [cloxiang.handlers :only [registrar move! connect!]]))
 
 (defn js-keys [obj]
     (.keys js/Object obj))
@@ -22,8 +22,8 @@
         [:get "/\\w{5}" registrar])
 
     (with-sockets
-        [:open MOVE_ROUTE connect]
-        [:message MOVE_ROUTE move]
+        [:open MOVE_ROUTE connect!]
+        [:message MOVE_ROUTE move!]
 
         [:open "/" #(println (aget % "upgradeReq" "url"))]
         [:message "/" (fn [msg ws]

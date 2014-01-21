@@ -4,14 +4,11 @@
           [cloxiang.utils :only [debug str->clj]])
     (:require [schema.core :as s]))
 
-(def MoveMessage
-    {:gameId s/Str ; five chars long
-     :player s/Str ; "black", "red", "none"
-     :message {
+(def MoveMessage {
             :type s/Str ; only "move" right now
             :from s/Str; dd?,dd? format, may be same as js is expecting
             :to s/Str ; same^
-        }})
+        })
 
 (def games (atom { }))
 
@@ -39,10 +36,10 @@
 (defn make-move! [board from to]
     (.makeMove board from to))
 
-(defn- handle-move [object]
-    (let [{:keys [gameId player message]} object
-          {:keys [type from to]} message
+(defn- handle-move! [gameId player object]
+    (let [{:keys [type from to]} object
           game (get-game @games gameId)
+          n (println game)
           {:keys [board red black]} game]
 
           (println (= type "move"))
@@ -57,24 +54,33 @@
                     (.send red object)
                     (.send black object)))))
 
-; TODO here: need a check for move legality, if legal then send
-; move to both red and black if true. Imperative as all heck, but much cleaner
+(defn- player? [player]
+    (or (= player "red")
+        (= player "black")))
 
-(defn move [message socket]
+(defn- finalize-metadata [[type id player]]
+     {:type type
+      :id id
+      :player player})
+
+(defn- get-metadata [socket]
+    (-> socket
+        (aget "upgradeReq")
+        get-url
+        (clojure.string/split (js/RegExp. "/"))
+        finalize-metadata))
+
+(defn move! [message socket]
     (->> message
         str->clj
         (validate MoveMessage)
         debug
-        handle-move))
+        ((fn [move]
+            (let [{:keys [id player]} (get-metadata socket)]
+                (handle-move! id player move))))))
 
-(defn player? [player]
-    (or (= player "red")
-        (= player "black")))
-
-(defn connect [socket]
-    (let [request (aget socket "upgradeReq")
-          info (get-url request)
-          [m id player] (clojure.string/split info #"/")
+(defn connect! [socket]
+    (let [{:keys [id player]} (get-metadata socket)
           game (get-game @games id)
           with-player (if (player? player)
                         (assoc game (keyword player) socket)
