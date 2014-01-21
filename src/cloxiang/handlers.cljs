@@ -1,7 +1,8 @@
 (ns cloxiang.handlers
     (:use [cloxiang.game :only
             [open missing-player get-game full?]]
-          [cloxiang.utils :only [debug str->clj]])
+          [cloxiang.utils :only [debug str->clj]]
+          [cljs.core :only [clj->js]])
     (:require [schema.core :as s]))
 
 (def MoveMessage {
@@ -39,20 +40,15 @@
 (defn- handle-move! [gameId player object]
     (let [{:keys [type from to]} object
           game (get-game @games gameId)
-          n (println game)
-          {:keys [board red black]} game]
-
-          (println (= type "move"))
-          (println (full? game))
-          (println (.canMove board from to))
-
+          {:keys [board red black]} game
+          message (->> object clj->js (.stringify js/JSON))]
           (if  (and (= type "move")
                     (full? game)
                     (.canMove board from to))
                 (do
                     (make-move! board from to)
-                    (.send red object)
-                    (.send black object)))))
+                    (.send red message)
+                    (.send black message)))))
 
 (defn- player? [player]
     (or (= player "red")
@@ -62,22 +58,20 @@
      {:type type
       :id id
       :player player})
-
 (defn- get-metadata [socket]
     (-> socket
         (aget "upgradeReq")
         get-url
-        (clojure.string/split (js/RegExp. "/"))
+        (clojure.string/split #"/")
         finalize-metadata))
 
 (defn move! [message socket]
-    (->> message
-        str->clj
-        (validate MoveMessage)
-        debug
-        ((fn [move]
-            (let [{:keys [id player]} (get-metadata socket)]
-                (handle-move! id player move))))))
+    (let [{:keys [id player]} (get-metadata socket)
+          finish! (partial handle-move! id player)]
+        (->> message
+            str->clj
+            (validate MoveMessage)
+            finish!)))
 
 (defn connect! [socket]
     (let [{:keys [id player]} (get-metadata socket)
@@ -85,6 +79,5 @@
           with-player (if (player? player)
                         (assoc game (keyword player) socket)
                         game)]
-        (println with-player)
         (swap! games #(assoc % id with-player))
         "connected"))

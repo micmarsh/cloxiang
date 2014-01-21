@@ -18,17 +18,11 @@
 
 (defn -main [& args] (->
     (initialize
-        [:get "/" #(println (view-js %))]
         [:get "/\\w{5}" registrar])
 
     (with-sockets
         [:open MOVE_ROUTE connect!]
-        [:message MOVE_ROUTE move!]
-
-        [:open "/" #(println (aget % "upgradeReq" "url"))]
-        [:message "/" (fn [msg ws]
-                        (println (aget ws "upgradeReq" "url"))
-                        msg)])
+        [:message MOVE_ROUTE move!])
 ))
 
 (set! *main-cli-fn* -main)
