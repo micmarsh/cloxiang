@@ -18,7 +18,9 @@
 
 (defn -main [& args] (->
     (initialize
-        [:get "/\\w{5}" registrar])
+        [:get "/\\w{5}" registrar]
+        {:static "public"
+         :port 8008})
 
     (with-sockets
         [:open MOVE_ROUTE connect!]

@@ -6,10 +6,10 @@
     (:require [schema.core :as s]))
 
 (def MoveMessage {
-            :type s/Str ; only "move" right now
-            :from s/Str; dd?,dd? format, may be same as js is expecting
-            :to s/Str ; same^
-        })
+  :type s/Str ; only "move" right now
+  :from s/Str; dd?,dd? format, may be same as js is expecting
+  :to s/Str ; same^
+})
 
 (def games (atom { }))
 

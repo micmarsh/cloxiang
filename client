@@ -1,0 +1,24 @@
+#!/usr/bin/python
+import subprocess
+import os
+
+HOME = os.environ['HOME']
+INDEX = "public/index.html"
+
+DIR = HOME + '/elm-workspace/xianqi'
+OLD_PATH = os.getcwd()
+os.chdir(DIR)
+subprocess.call('elm --make -o Xiangqi.elm'.split())
+os.chdir(OLD_PATH)
+
+calls = [
+    'cp ' + DIR + '/index.html ' + INDEX,
+    'sed -i s/build\///g ' + INDEX,
+    'cp -r  ' + DIR + '/assets/ public/assets/',
+    'cp ' + HOME + '/.cabal/share/Elm-0.10.1/elm-runtime.js public/',
+    'cp ' + DIR + '/build/Xiangqi.js public/'
+]
+
+for call in calls:
+    print call
+    subprocess.call(call.split())
